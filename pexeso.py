@@ -171,15 +171,16 @@ class Gameplay():
 			print("\nPlayer 1 has {} point(s).\nPlayer 2 has {} point(s).\n{}\n{} wins!".format(win_message[1],win_message[2],25*"-",win_message[0]))
 			return 0
 
-
 	def clear1(self):
+		"""
+		Clear the screen.
+		"""
 		try:
 			clear2=lambda: os.system('cls')
 			return clear2
 		except:
 			clear2=lambda: os.system('clear')
 			return clear2
-
 
 	def main(self):
 		"""
@@ -188,22 +189,15 @@ class Gameplay():
 		while True:
 			for i in range(1,3): 
 				if game.turn(i,self.win_count)==0: return None
-		# return game.main()
-
 
 battle=Battlefield()
 x=y=battle.dimension("size of battlefield (only even numbers)",2,10,8)
 stuff=battle.board_Stuffing(x,y)
-# clear=game.clear()
 
 game=Gameplay(["",0,0],0)
 riddle=game.riddle(x)
 clear=game.clear1()
-# clear=lambda: os.system('cls')
-# clear()
 
-# win=["",0,0]
-# win_count=0
 game.main()
 
 
