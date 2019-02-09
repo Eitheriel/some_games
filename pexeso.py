@@ -57,9 +57,11 @@ class Gameplay():
 
 	"""
 
-	def __init__(self,win,win_count):
+	def __init__(self,x,win=["",0,0],win_count=0):
 		self.win=win
 		self.win_count=win_count
+		self.riddle=self.riddle(x)
+		self.clear=self.clear1()
 
 	def riddle(self,x):
 		riddle_list=[]
@@ -99,7 +101,7 @@ class Gameplay():
 				print("\nPlease try again.")
 				continue
 
-	def reveal(self,player_number,turn_a,turn_b):
+	def reveal(self,riddle,player_number,turn_a,turn_b):
 		"""
 		Return integer 1 or 0 representing a win point.
 		This method is also used for 'revealing' symbols on the back of card and evaluating, if player
@@ -134,7 +136,7 @@ class Gameplay():
 			self.win[0]="Nobody"
 			return self.win
 
-	def half_turn(self,player_number,turn_num):
+	def half_turn(self,riddle,player_number,turn_num):
 		"""
 		Return  a) integer - number of card selected by player,
 				b) integers - coordinates of the selected card on the battlefield
@@ -143,29 +145,29 @@ class Gameplay():
 		print("\nPlayer {}'s {} move:".format(player_number,turn_num))
 		battle.board_Frame(x,stuff)
 		turn_a=game.round(stuff,riddle,x)
-		clear()
+		self.clear()
 		return turn_a
 
-	def turn(self,i,win_count):
+	def turn(self,player_num,win_count):
 		"""
 		Return integer, which signals, that all pairs of cards has been revealed and game ends.
 		Prints informations about final score: who won and how many points each player achieved.
 		"""
-		turn_a=game.half_turn(i,"first")
-		turn_b=game.half_turn(i,"second")
+		turn_a=game.half_turn(self.riddle,player_num,"first")
+		turn_b=game.half_turn(self.riddle,player_num,"second")
 
-		print("\nPlayer {}'s second move:".format(i))
+		print("\nPlayer {}'s second move:".format(player_num))
 		battle.board_Frame(x,stuff)
 		
-		win_point=game.reveal(i,turn_a,turn_b)
+		win_point=game.reveal(self.riddle,player_num,turn_a,turn_b)
 		self.win_count+=win_point
-		win_message=game.win_score(i,self.win,win_point)
+		win_message=game.win_score(player_num,self.win,win_point)
 		time.sleep(2)
-		clear()
+		self.clear()
 
-		if win_point==1 and self.win_count!=(x**2)/2: return game.turn(i,self.win_count)
+		if win_point==1 and self.win_count!=(x**2)/2: return game.turn(player_num,self.win_count)
 		elif win_point==1 and self.win_count==(x**2)/2:
-			print("\nPlayer {}'s second move:".format(i))
+			print("\nPlayer {}'s second move:".format(player_num))
 			battle.board_Frame(x,stuff)		
 			
 			print("\nPlayer 1 has {} point(s).\nPlayer 2 has {} point(s).\n{}\n{} wins!".format(win_message[1],win_message[2],25*"-",win_message[0]))
@@ -184,7 +186,7 @@ class Gameplay():
 
 	def main(self):
 		"""
-		Main function of the game. Recursive function repeat itself until all cards are revealed.
+		Main function of the game. This method repeat itself until all cards are revealed.
 		"""
 		while True:
 			for i in range(1,3): 
@@ -194,10 +196,7 @@ battle=Battlefield()
 x=y=battle.dimension("size of battlefield (only even numbers)",2,10,8)
 stuff=battle.board_Stuffing(x,y)
 
-game=Gameplay(["",0,0],0)
-riddle=game.riddle(x)
-clear=game.clear1()
-
+game=Gameplay(x)
 game.main()
 
 
