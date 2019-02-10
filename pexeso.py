@@ -75,7 +75,7 @@ class Gameplay():
 		return riddle_list
 
 
-	def round(self,stuff1,riddle1,x):
+	def round(self,stuff1,x):
 		"""
 		Return  a) integer - number of card selected by player,
 				b) integers - coordinates of the selected card on the battlefield
@@ -95,13 +95,13 @@ class Gameplay():
 					print("\nThis cell is already empty or chosen, try another.")
 					continue
 				else:
-					stuff1[coordinate1][coordinate2]=riddle1[turn_input-1]
+					stuff1[coordinate1][coordinate2]=self.riddle[turn_input-1]
 					return turn_input,coordinate1,coordinate2
 			except ValueError:
 				print("\nPlease try again.")
 				continue
 
-	def reveal(self,riddle,player_number,turn_a,turn_b):
+	def reveal(self,player_number,turn_a,turn_b):
 		"""
 		Return integer 1 or 0 representing a win point.
 		This method is also used for 'revealing' symbols on the back of card and evaluating, if player
@@ -111,7 +111,7 @@ class Gameplay():
 		""" 
 		num_imput_1,num_coord_1x,num_coord_1y=turn_a
 		num_input_2,num_coord_2x,num_coord_2y=turn_b
-		if riddle[num_imput_1-1]==riddle[num_input_2-1]:
+		if self.riddle[num_imput_1-1]==self.riddle[num_input_2-1]:
 			stuff[num_coord_1x][num_coord_1y]=stuff[num_coord_2x][num_coord_2y]=" "
 			print("Player no. {} gains a point!".format(player_number))
 			return 1
@@ -120,7 +120,7 @@ class Gameplay():
 			stuff[num_coord_2x][num_coord_2y]=num_input_2
 			return 0
 
-	def win_score(self,player_number,win,points):
+	def win_score(self,player_number,points):
 		"""
 		Return string and two integers.
 		The string carries the name of winner; integers inform about number of poins, that both players achieved.
@@ -136,7 +136,7 @@ class Gameplay():
 			self.win[0]="Nobody"
 			return self.win
 
-	def half_turn(self,riddle,player_number,turn_num):
+	def half_turn(self,player_number,turn_num):
 		"""
 		Return  a) integer - number of card selected by player,
 				b) integers - coordinates of the selected card on the battlefield
@@ -144,28 +144,28 @@ class Gameplay():
 		"""
 		print("\nPlayer {}'s {} move:".format(player_number,turn_num))
 		battle.board_Frame(x,stuff)
-		turn_a=game.round(stuff,riddle,x)
+		turn_a=game.round(stuff,x)
 		self.clear()
 		return turn_a
 
-	def turn(self,player_num,win_count):
+	def turn(self,player_num):
 		"""
 		Return integer, which signals, that all pairs of cards has been revealed and game ends.
 		Prints informations about final score: who won and how many points each player achieved.
 		"""
-		turn_a=game.half_turn(self.riddle,player_num,"first")
-		turn_b=game.half_turn(self.riddle,player_num,"second")
+		turn_a=game.half_turn(player_num,"first")
+		turn_b=game.half_turn(player_num,"second")
 
 		print("\nPlayer {}'s second move:".format(player_num))
 		battle.board_Frame(x,stuff)
 		
-		win_point=game.reveal(self.riddle,player_num,turn_a,turn_b)
+		win_point=game.reveal(player_num,turn_a,turn_b)
 		self.win_count+=win_point
-		win_message=game.win_score(player_num,self.win,win_point)
+		win_message=game.win_score(player_num,win_point)
 		time.sleep(2)
 		self.clear()
 
-		if win_point==1 and self.win_count!=(x**2)/2: return game.turn(player_num,self.win_count)
+		if win_point==1 and self.win_count!=(x**2)/2: return game.turn(player_num)
 		elif win_point==1 and self.win_count==(x**2)/2:
 			print("\nPlayer {}'s second move:".format(player_num))
 			battle.board_Frame(x,stuff)		
@@ -190,7 +190,7 @@ class Gameplay():
 		"""
 		while True:
 			for i in range(1,3): 
-				if game.turn(i,self.win_count)==0: return None
+				if game.turn(i)==0: return None
 
 battle=Battlefield()
 x=y=battle.dimension("size of battlefield (only even numbers)",2,10,8)
