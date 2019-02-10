@@ -16,7 +16,7 @@ class Battlefield():
 					print("\nYou must enter the proper number.")
 					continue
 
-	def adjust_line(self,x,y):
+	def adjust_Line(self,x,y):
 		"""
 		Returns integer representing the length of line of the same symbols, which is needed for winning the game.
 		The returning number is adjusted according to the size of battlefield to ensure of win possibility.
@@ -156,7 +156,7 @@ Have fun!
 battle=Battlefield()
 x=battle.dimension("number of columns",3,20,3)
 y=battle.dimension("number of rows",3,20,3)
-line=battle.adjust_line(x,y)
+line=battle.adjust_Line(x,y)
 stuff=battle.board_Stuffing(x,y)
 
 player_info=Player()
