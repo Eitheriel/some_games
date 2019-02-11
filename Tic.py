@@ -1,4 +1,6 @@
+
 class Battlefield():
+	# def __init__ (self,)
 
 	def dimension(self,text,x,y,num):
 		"""Returns integer representing variable value according to the text in input."""
@@ -58,7 +60,12 @@ class Battlefield():
 			print(horizontal_wall)
 
 
-class Player(Battlefield):
+class Gameplay():
+
+	def __init__(self):
+		self.num_of_players=battle.dimension("number of players",2,3,2)
+		self.list_of_players=self.symbol(self.num_of_players,"X","O","#")
+		self.line=battle.adjust_Line(x,y)
 
 	def symbol(self,num_of_players1,*symb):
 		"""
@@ -85,9 +92,6 @@ class Player(Battlefield):
 					print("\nPlease choose your symbol.")
 					continue
 		return list_of_players
-
-
-class Gameplay():
 
 	def turn1(self,stuff1,x,y,symbol):
 		"""
@@ -117,7 +121,7 @@ class Gameplay():
 				print("\nPlease try again.")
 				continue
 
-	def winwin(self,line1,stuff,x_coord,y_coord):
+	def winwin(self,stuff,x_coord,y_coord):
 		"""
 		Controls, if player created the line of same symbols of the given length on the battlefield. If yes, it returns True.
 
@@ -126,9 +130,9 @@ class Gameplay():
 		Third loop checks, if there is proper count of symbols in the line in the certain direction.
 		"""
 		for const1,const2 in ((1,1),(1,-1),(1,0),(0,1)):
-			for i in range(1,line1+1):
+			for i in range(1,self.line+1):
 				try_set=set()
-				for j in range(-line1+i,0+i):
+				for j in range(-self.line+i,0+i):
 					if y_coord+j*const2<0 or x_coord+j*const1<0:
 						try_set=set()
 						break
@@ -144,48 +148,44 @@ class Gameplay():
 				if len(try_set)==1:
 					return True
 
-print("""
-Welcome in Tic Tac Toe game!
-============================
-In this game you can set a lot of options, but if you want 
-to play classical Tic Tac Toe, just 'enter' everything.
+	def main(self):
 
-Have fun!
-""")
+		print("""
+		Welcome in Tic Tac Toe game!
+		============================
+		In this game you can set a lot of options, but if you want 
+		to play classical Tic Tac Toe, just 'enter' everything.
+
+		Have fun!
+		""")
+
+		print("\nLet's start a game!\n===================\n")
+		battle.board_Frame(x,stuff)
+
+		count=0
+		end=True
+		while end:
+			for i,j in self.list_of_players.items():
+				print("\nPlayer '{}':".format(j))
+				coo_x,coo_y=play.turn1(stuff,x,y,j)
+				battle.board_Frame(x,stuff)
+				if play.winwin(stuff,int(coo_x),int(coo_y)):
+					print("Player {} win! Congratulation!".format(j))
+					end=False
+					break
+				count+=1
+				if count==x*y: #Counter terminates the game in case, when all cells are filled.
+					print("It's a draw.")
+					end=False
+					break		
+
 
 battle=Battlefield()
 x=battle.dimension("number of columns",3,20,3)
 y=battle.dimension("number of rows",3,20,3)
-line=battle.adjust_Line(x,y)
 stuff=battle.board_Stuffing(x,y)
 
-player_info=Player()
-num_of_players=player_info.dimension("number of players",2,3,2)
-list_of_players=player_info.symbol(num_of_players,"X","O","#")
-
 play=Gameplay()
-
-print("\nLet's start a game!\n===================\n")
-battle.board_Frame(x,stuff) # Create the overview of battlefield.
-
-count=0
-end=True
-while end:
-	for i,j in list_of_players.items():
-		print("\nPlayer '{}':".format(j))
-		coo_x,coo_y=play.turn1(stuff,x,y,j)
-		battle.board_Frame(x,stuff)
-		if play.winwin(line,stuff,int(coo_x),int(coo_y)):
-			print("Player {} win! Congratulation!".format(j))
-			end=False
-			break
-		count+=1
-		if count==x*y: #Counter terminates the game in case, when all cells are filled.
-			print("It's a draw.")
-			end=False
-			break
-
-
-
+play.main()
 
 
