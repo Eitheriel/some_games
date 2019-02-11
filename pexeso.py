@@ -5,14 +5,23 @@ import time
 
 class Battlefield():
 
-	def dimension(self,text,x,y,num):
+	def __init__(self,text,lower_limit,higher_limit,default_num):
+		self.text=text
+		self.lower_l=lower_limit
+		self.higher_l=higher_limit
+		self.default_n=default_num
+		self.coord_x=self.dimension()
+		self.coord_y=self.coord_x
+		self.stuff=self.board_Stuffing()
+
+	def dimension(self):
 		"""Returns integer representing variable value according to the text in input."""
 		while True:
-				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(text,x,y,num))
+				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(self.text,self.lower_l,self.higher_l,self.default_n))
 				if dim=="":
-					return num 
+					return self.default_n 
 				try:
-					if int(dim) not in range(x,y+1,2):
+					if int(dim) not in range(self.lower_l,self.higher_l+1,2):
 						print("\nYou must enter the proper number.")
 						continue
 					else:
@@ -21,7 +30,7 @@ class Battlefield():
 					print("\nYou must enter the proper number.")
 					continue
 
-	def board_Stuffing(self,x,y):
+	def board_Stuffing(self):
 		"""
 		Return the list of list.
 		In every list is array of numbers representing each cell of battlefield. 
@@ -30,23 +39,23 @@ class Battlefield():
 
 		superboard=[]
 		num1=1
-		for i in range(y):
+		for i in range(self.coord_y):
 			line=[]
-			for j in range(x):
+			for j in range(self.coord_x):
 				line.append(num1)
 				num1+=1
 			superboard.append(line)
 		return superboard
 
-	def board_Frame(self,x,stuffing):
+	def board_Frame(self):
 		"""
 		Return graphical frame of cells of battlefield according to the number of cells.
 		"""
 
-		horizontal_wall="-"*4*x+"-"
-		vertical_wall="|"+x*"{:^3}|"
+		horizontal_wall="-"*4*self.coord_x+"-"
+		vertical_wall="|"+self.coord_x*"{:^3}|"
 		print(horizontal_wall)
-		for i in stuffing:
+		for i in self.stuff:
 			print(vertical_wall.format(*(i)))
 			print(horizontal_wall)
 
@@ -57,15 +66,18 @@ class Gameplay():
 
 	"""
 
-	def __init__(self,x,win=["",0,0],win_count=0):
+	def __init__(self,win=["",0,0],win_count=0):
+		self.x=battle.coord_x
+		self.y=self.x
+		self.stuff=battle.stuff
 		self.win=win
 		self.win_count=win_count
-		self.riddle=self.riddle(x)
+		self.riddle=self.riddle()
 		self.clear=self.clear1()
 
-	def riddle(self,x):
+	def riddle(self):
 		riddle_list=[]
-		index1=int((x**2)/2)
+		index1=int((self.x**2)/2)
 		string1=list(string.ascii_letters)
 		random.shuffle(string1)
 
@@ -75,7 +87,7 @@ class Gameplay():
 		return riddle_list
 
 
-	def round(self,stuff1,x):
+	def round(self):
 		"""
 		Return  a) integer - number of card selected by player,
 				b) integers - coordinates of the selected card on the battlefield
@@ -85,17 +97,17 @@ class Gameplay():
 			try:
 				turn_input=int(input("Please enter the number of the card you want to reveal: "))
 				
-				coordinate1=int((turn_input-0.5)//x)
-				coordinate2=(turn_input%x)-1 if turn_input%x!=0 else x-1 
+				coordinate1=int((turn_input-0.5)//self.x)
+				coordinate2=(turn_input%self.x)-1 if turn_input%self.x!=0 else self.x-1 
 				
-				if turn_input not in range (1,(x*y)+1):
-					print("\nYou may enter numbers only in range from 1 to {}.".format(x*y))
+				if turn_input not in range (1,(self.x*self.y)+1):
+					print("\nYou may enter numbers only in range from 1 to {}.".format(self.x*self.y))
 					continue
-				if stuff1[coordinate1][coordinate2]!= turn_input:
+				if self.stuff[coordinate1][coordinate2]!= turn_input:
 					print("\nThis cell is already empty or chosen, try another.")
 					continue
 				else:
-					stuff1[coordinate1][coordinate2]=self.riddle[turn_input-1]
+					self.stuff[coordinate1][coordinate2]=self.riddle[turn_input-1]
 					return turn_input,coordinate1,coordinate2
 			except ValueError:
 				print("\nPlease try again.")
@@ -112,12 +124,12 @@ class Gameplay():
 		num_imput_1,num_coord_1x,num_coord_1y=turn_a
 		num_input_2,num_coord_2x,num_coord_2y=turn_b
 		if self.riddle[num_imput_1-1]==self.riddle[num_input_2-1]:
-			stuff[num_coord_1x][num_coord_1y]=stuff[num_coord_2x][num_coord_2y]=" "
+			self.stuff[num_coord_1x][num_coord_1y]=self.stuff[num_coord_2x][num_coord_2y]=" "
 			print("Player no. {} gains a point!".format(player_number))
 			return 1
 		else:
-			stuff[num_coord_1x][num_coord_1y]=num_imput_1
-			stuff[num_coord_2x][num_coord_2y]=num_input_2
+			self.stuff[num_coord_1x][num_coord_1y]=num_imput_1
+			self.stuff[num_coord_2x][num_coord_2y]=num_input_2
 			return 0
 
 	def win_score(self,player_number,points):
@@ -143,8 +155,8 @@ class Gameplay():
 		This method is same as 'round', but contains some graphical editing of what players can see. 
 		"""
 		print("\nPlayer {}'s {} move:".format(player_number,turn_num))
-		battle.board_Frame(x,stuff)
-		turn_a=game.round(stuff,x)
+		battle.board_Frame()
+		turn_a=game.round()
 		self.clear()
 		return turn_a
 
@@ -157,7 +169,7 @@ class Gameplay():
 		turn_b=game.half_turn(player_num,"second")
 
 		print("\nPlayer {}'s second move:".format(player_num))
-		battle.board_Frame(x,stuff)
+		battle.board_Frame()
 		
 		win_point=game.reveal(player_num,turn_a,turn_b)
 		self.win_count+=win_point
@@ -165,10 +177,12 @@ class Gameplay():
 		time.sleep(2)
 		self.clear()
 
-		if win_point==1 and self.win_count!=(x**2)/2: return game.turn(player_num)
-		elif win_point==1 and self.win_count==(x**2)/2:
-			print("\nPlayer {}'s second move:".format(player_num))
-			battle.board_Frame(x,stuff)		
+		if win_point==1:
+			if self.win_count!=(self.x**2)/2: 
+				return game.turn(player_num)
+			else:
+				print("\nPlayer {}'s second move:".format(player_num))
+				battle.board_Frame()		
 			
 			print("\nPlayer 1 has {} point(s).\nPlayer 2 has {} point(s).\n{}\n{} wins!".format(win_message[1],win_message[2],25*"-",win_message[0]))
 			return 0
@@ -192,11 +206,8 @@ class Gameplay():
 			for i in range(1,3): 
 				if game.turn(i)==0: return None
 
-battle=Battlefield()
-x=y=battle.dimension("size of battlefield (only even numbers)",2,10,8)
-stuff=battle.board_Stuffing(x,y)
-
-game=Gameplay(x)
+battle=Battlefield("size of battlefield (only even numbers)",2,10,8)
+game=Gameplay()
 game.main()
 
 
