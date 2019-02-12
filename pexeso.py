@@ -5,23 +5,14 @@ import time
 
 class Battlefield():
 
-	def __init__(self,text,lower_limit,higher_limit,default_num):
-		self.text=text
-		self.lower_l=lower_limit
-		self.higher_l=higher_limit
-		self.default_n=default_num
-		self.coord_x=self.dimension()
-		self.coord_y=self.coord_x
-		self.stuff=self.board_Stuffing()
-
-	def dimension(self):
+	def dimension(self,text,lower_limit,higher_limit,default_num):
 		"""Returns integer representing variable value according to the text in input."""
 		while True:
-				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(self.text,self.lower_l,self.higher_l,self.default_n))
+				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(text,lower_limit,higher_limit,default_num))
 				if dim=="":
-					return self.default_n 
+					return default_num 
 				try:
-					if int(dim) not in range(self.lower_l,self.higher_l+1,2):
+					if int(dim) not in range(lower_limit,higher_limit+1,2):
 						print("\nYou must enter the proper number.")
 						continue
 					else:
@@ -30,7 +21,7 @@ class Battlefield():
 					print("\nYou must enter the proper number.")
 					continue
 
-	def board_Stuffing(self):
+	def board_Stuffing(self,x,y):
 		"""
 		Return the list of list.
 		In every list is array of numbers representing each cell of battlefield. 
@@ -39,23 +30,23 @@ class Battlefield():
 
 		superboard=[]
 		num1=1
-		for i in range(self.coord_y):
+		for i in range(y):
 			line=[]
-			for j in range(self.coord_x):
+			for j in range(x):
 				line.append(num1)
 				num1+=1
 			superboard.append(line)
 		return superboard
 
-	def board_Frame(self):
+	def board_Frame(self,x,stuff):
 		"""
 		Return graphical frame of cells of battlefield according to the number of cells.
 		"""
 
-		horizontal_wall="-"*4*self.coord_x+"-"
-		vertical_wall="|"+self.coord_x*"{:^3}|"
+		horizontal_wall="-"*4*x+"-"
+		vertical_wall="|"+x*"{:^3}|"
 		print(horizontal_wall)
-		for i in self.stuff:
+		for i in stuff:
 			print(vertical_wall.format(*(i)))
 			print(horizontal_wall)
 
@@ -66,12 +57,12 @@ class Gameplay():
 
 	"""
 
-	def __init__(self,win=["",0,0],win_count=0):
-		self.x=battle.coord_x
+	def __init__(self):
+		self.x=battle.dimension("size of battlefield (only even numbers)",2,10,8)
 		self.y=self.x
-		self.stuff=battle.stuff
-		self.win=win
-		self.win_count=win_count
+		self.stuff=battle.board_Stuffing(self.x,self.y)
+		self.win=["",0,0]
+		self.win_count=0
 		self.riddle=self.riddle()
 		self.clear=self.clear1()
 
@@ -155,7 +146,7 @@ class Gameplay():
 		This method is same as 'round', but contains some graphical editing of what players can see. 
 		"""
 		print("\nPlayer {}'s {} move:".format(player_number,turn_num))
-		battle.board_Frame()
+		battle.board_Frame(self.x,self.stuff)
 		turn_a=game.round()
 		self.clear()
 		return turn_a
@@ -169,7 +160,7 @@ class Gameplay():
 		turn_b=game.half_turn(player_num,"second")
 
 		print("\nPlayer {}'s second move:".format(player_num))
-		battle.board_Frame()
+		battle.board_Frame(self.x,self.stuff)
 		
 		win_point=game.reveal(player_num,turn_a,turn_b)
 		self.win_count+=win_point
@@ -182,7 +173,7 @@ class Gameplay():
 				return game.turn(player_num)
 			else:
 				print("\nPlayer {}'s second move:".format(player_num))
-				battle.board_Frame()		
+				battle.board_Frame(self.x,self.stuff)		
 			
 			print("\nPlayer 1 has {} point(s).\nPlayer 2 has {} point(s).\n{}\n{} wins!".format(win_message[1],win_message[2],25*"-",win_message[0]))
 			return 0
@@ -206,8 +197,6 @@ class Gameplay():
 			for i in range(1,3): 
 				if game.turn(i)==0: return None
 
-battle=Battlefield("size of battlefield (only even numbers)",2,10,8)
+battle=Battlefield()
 game=Gameplay()
 game.main()
-
-
