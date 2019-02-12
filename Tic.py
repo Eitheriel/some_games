@@ -1,15 +1,14 @@
 
 class Battlefield():
-	# def __init__ (self,)
 
-	def dimension(self,text,x,y,num):
+	def dimension(self,text,lower_limit,higher_limit,default_num):
 		"""Returns integer representing variable value according to the text in input."""
 		while True:
-				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(text,x,y,num))
+				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(text,lower_limit,higher_limit,default_num))
 				if dim=="":
-					return num 
+					return default_num 
 				try:
-					if int(dim) not in range(x,y+1):
+					if int(dim) not in range(lower_limit,higher_limit+1,2):
 						print("\nYou must enter the proper number.")
 						continue
 					else:
@@ -17,18 +16,6 @@ class Battlefield():
 				except ValueError:
 					print("\nYou must enter the proper number.")
 					continue
-
-	def adjust_Line(self,x,y):
-		"""
-		Returns integer representing the length of line of the same symbols, which is needed for winning the game.
-		The returning number is adjusted according to the size of battlefield to ensure of win possibility.
-		"""
-
-		if x==3 or y==3: return 3
-		if x==4 or y==4: return 4
-		if x>=5 or y>=5: return battle.dimension("length of line",3,5,3)
-
-
 
 	def board_Stuffing(self,x,y):
 		"""
@@ -47,7 +34,7 @@ class Battlefield():
 			superboard.append(line)
 		return superboard
 
-	def board_Frame(self,x,stuffing):
+	def board_Frame(self,x,stuff):
 		"""
 		Return graphical frame of cells of battlefield according to the number of cells.
 		"""
@@ -55,17 +42,29 @@ class Battlefield():
 		horizontal_wall="-"*4*x+"-"
 		vertical_wall="|"+x*"{:^3}|"
 		print(horizontal_wall)
-		for i in stuffing:
+		for i in stuff:
 			print(vertical_wall.format(*(i)))
 			print(horizontal_wall)
 
+	def adjust_Line(self,x,y):
+		"""
+		Returns integer representing the length of line of the same symbols, which is needed for winning the game.
+		The returning number is adjusted according to the size of battlefield to ensure of win possibility.
+		"""
+
+		if x==3 or y==3: return 3
+		if x==4 or y==4: return 4
+		if x>=5 or y>=5: return self.dimension("length of line",3,5,3)
 
 class Gameplay():
 
 	def __init__(self):
+		self.x=battle.dimension("number of columns",3,20,3)
+		self.y=battle.dimension("number of rows",3,20,3)
+		self.line=battle.adjust_Line(self.x,self.y)
 		self.num_of_players=battle.dimension("number of players",2,3,2)
-		self.list_of_players=self.symbol(self.num_of_players,"X","O","#")
-		self.line=battle.adjust_Line(x,y)
+		self.list_of_players=self.symbol(self.num_of_players,"X","O","#","@")
+		self.stuff=battle.board_Stuffing(self.x,self.y)
 
 	def symbol(self,num_of_players1,*symb):
 		"""
@@ -93,7 +92,7 @@ class Gameplay():
 					continue
 		return list_of_players
 
-	def turn1(self,stuff1,x,y,symbol):
+	def turn1(self,symbol):
 		"""
 		Replace the order number of cell with the specific symbol of player. 
 		Returns coordinates of number the player want to replace for his/her symbol.
@@ -104,24 +103,24 @@ class Gameplay():
 			try:
 				turn_input=int(input("Please enter the number of the cell you want to put your symbol: "))
 				
-				coordinate1=int((turn_input-0.5)//x)
-				coordinate2=(turn_input%x)-1 if turn_input%x!=0 else x-1 
+				coordinate1=int((turn_input-0.5)//self.x)
+				coordinate2=(turn_input%self.x)-1 if turn_input%self.x!=0 else self.x-1 
 				
-				if turn_input not in range (1,(x*y)+1):
-					print("\nYou may enter numbers only in range from 1 to {}.".format(x*y))
+				if turn_input not in range (1,(self.x*self.y)+1):
+					print("\nYou may enter numbers only in range from 1 to {}.".format(self.x*self.y))
 					continue
-				if stuff1[coordinate1][coordinate2]!= turn_input:
+				if self.stuff[coordinate1][coordinate2]!= turn_input:
 					print("\nThis cell is already taken, try another.")
 					continue
 				else:
-					stuff1[coordinate1][coordinate2]=symbol
+					self.stuff[coordinate1][coordinate2]=symbol
 					return coordinate1,coordinate2
 					break
 			except ValueError:
 				print("\nPlease try again.")
 				continue
 
-	def winwin(self,stuff,x_coord,y_coord):
+	def winwin(self,x_coord,y_coord):
 		"""
 		Controls, if player created the line of same symbols of the given length on the battlefield. If yes, it returns True.
 
@@ -138,7 +137,7 @@ class Gameplay():
 						break
 					else:
 						try:
-							try_set.add(stuff[x_coord+j*const1][y_coord+j*const2])
+							try_set.add(self.stuff[x_coord+j*const1][y_coord+j*const2])
 							if len(try_set)>1:
 								try_set=set()
 								break
@@ -160,31 +159,26 @@ class Gameplay():
 		""")
 
 		print("\nLet's start a game!\n===================\n")
-		battle.board_Frame(x,stuff)
+		battle.board_Frame(self.x,self.stuff)
 
 		count=0
 		end=True
 		while end:
 			for i,j in self.list_of_players.items():
 				print("\nPlayer '{}':".format(j))
-				coo_x,coo_y=play.turn1(stuff,x,y,j)
-				battle.board_Frame(x,stuff)
-				if play.winwin(stuff,int(coo_x),int(coo_y)):
+				coo_x,coo_y=play.turn1(j)
+				battle.board_Frame(self.x,self.stuff)
+				if play.winwin(int(coo_x),int(coo_y)):
 					print("Player {} win! Congratulation!".format(j))
 					end=False
 					break
 				count+=1
-				if count==x*y: #Counter terminates the game in case, when all cells are filled.
+				if count==self.x*self.y: #Counter terminates the game in case, when all cells are filled.
 					print("It's a draw.")
 					end=False
 					break		
 
-
 battle=Battlefield()
-x=battle.dimension("number of columns",3,20,3)
-y=battle.dimension("number of rows",3,20,3)
-stuff=battle.board_Stuffing(x,y)
-
 play=Gameplay()
 play.main()
 
