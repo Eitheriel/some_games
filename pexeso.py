@@ -5,14 +5,14 @@ import time
 
 class Battlefield():
 
-	def dimension(self,text,lower_limit,higher_limit,default_num):
+	def dimension(self,text,lower_limit,higher_limit,default_num,stride=1):
 		"""Returns integer representing variable value according to the text in input."""
 		while True:
 				dim=input("Please enter the {}, between {} and {}. Press enter and {} will be set. ".format(text,lower_limit,higher_limit,default_num))
 				if dim=="":
 					return default_num 
 				try:
-					if int(dim) not in range(lower_limit,higher_limit+1,2):
+					if int(dim) not in range(lower_limit,higher_limit+1,stride):
 						print("\nYou must enter the proper number.")
 						continue
 					else:
@@ -58,7 +58,7 @@ class Gameplay():
 	"""
 
 	def __init__(self):
-		self.x=battle.dimension("size of battlefield (only even numbers)",2,10,8)
+		self.x=battle.dimension("size of battlefield (only even numbers)",2,10,8,2)
 		self.y=self.x
 		self.stuff=battle.board_Stuffing(self.x,self.y)
 		self.win=["",0,0]
