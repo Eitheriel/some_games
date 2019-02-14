@@ -58,9 +58,10 @@ class Gameplay():
 	"""
 
 	def __init__(self):
-		self.x=battle.dimension("size of battlefield (only even numbers)",2,10,8,2)
+		self.battle=Battlefield()
+		self.x=self.battle.dimension("size of battlefield (only even numbers)",2,10,8,2)
 		self.y=self.x
-		self.stuff=battle.board_Stuffing(self.x,self.y)
+		self.stuff=self.battle.board_Stuffing(self.x,self.y)
 		self.win=["",0,0]
 		self.win_count=0
 		self.riddle=self.riddle()
@@ -146,7 +147,7 @@ class Gameplay():
 		This method is same as 'round', but contains some graphical editing of what players can see. 
 		"""
 		print("\nPlayer {}'s {} move:".format(player_number,turn_num))
-		battle.board_Frame(self.x,self.stuff)
+		self.battle.board_Frame(self.x,self.stuff)
 		turn_a=game.round()
 		self.clear()
 		return turn_a
@@ -160,7 +161,7 @@ class Gameplay():
 		turn_b=game.half_turn(player_num,"second")
 
 		print("\nPlayer {}'s second move:".format(player_num))
-		battle.board_Frame(self.x,self.stuff)
+		self.battle.board_Frame(self.x,self.stuff)
 		
 		win_point=game.reveal(player_num,turn_a,turn_b)
 		self.win_count+=win_point
@@ -173,7 +174,7 @@ class Gameplay():
 				return game.turn(player_num)
 			else:
 				print("\nPlayer {}'s second move:".format(player_num))
-				battle.board_Frame(self.x,self.stuff)		
+				self.battle.board_Frame(self.x,self.stuff)		
 			
 			print("\nPlayer 1 has {} point(s).\nPlayer 2 has {} point(s).\n{}\n{} wins!".format(win_message[1],win_message[2],25*"-",win_message[0]))
 			return 0
@@ -197,6 +198,5 @@ class Gameplay():
 			for i in range(1,3): 
 				if game.turn(i)==0: return None
 
-battle=Battlefield()
 game=Gameplay()
 game.main()
