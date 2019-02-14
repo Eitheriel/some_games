@@ -59,12 +59,13 @@ class Battlefield():
 class Gameplay():
 
 	def __init__(self):
-		self.x=battle.dimension("number of columns",3,20,3)
-		self.y=battle.dimension("number of rows",3,20,3)
-		self.line=battle.adjust_Line(self.x,self.y)
-		self.num_of_players=battle.dimension("number of players",2,3,2)
+		self.battle=Battlefield()
+		self.x=self.battle.dimension("number of columns",3,20,3)
+		self.y=self.battle.dimension("number of rows",3,20,3)
+		self.line=self.battle.adjust_Line(self.x,self.y)
+		self.num_of_players=self.battle.dimension("number of players",2,3,2)
 		self.list_of_players=self.symbol(self.num_of_players,"X","O","#","@")
-		self.stuff=battle.board_Stuffing(self.x,self.y)
+		self.stuff=self.battle.board_Stuffing(self.x,self.y)
 
 	def symbol(self,num_of_players1,*symb):
 		"""
@@ -159,7 +160,7 @@ class Gameplay():
 		""")
 
 		print("\nLet's start a game!\n===================\n")
-		battle.board_Frame(self.x,self.stuff)
+		self.battle.board_Frame(self.x,self.stuff)
 
 		count=0
 		end=True
@@ -167,7 +168,7 @@ class Gameplay():
 			for i,j in self.list_of_players.items():
 				print("\nPlayer '{}':".format(j))
 				coo_x,coo_y=play.turn1(j)
-				battle.board_Frame(self.x,self.stuff)
+				self.battle.board_Frame(self.x,self.stuff)
 				if play.winwin(int(coo_x),int(coo_y)):
 					print("Player {} win! Congratulation!".format(j))
 					end=False
@@ -178,7 +179,6 @@ class Gameplay():
 					end=False
 					break		
 
-battle=Battlefield()
 play=Gameplay()
 play.main()
 
